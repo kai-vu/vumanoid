@@ -16,3 +16,6 @@ env/
 camera_settings.log
 
 *.weights
+*.pt
+state*
+haarcascade*
