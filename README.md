@@ -10,7 +10,7 @@ Create and activate an virtual environment, as follows:
 $ git clone git@github.com:kai-vu/vumanoid.git
 $ cd vumanoid/
 $ python -m venv env
-$ env/bin/activate
+$ source env/bin/activate
 ```
 
 After have installed and activated the environment, install all the dependencies:
@@ -33,3 +33,10 @@ To download the `yolov3.weights`, just run:
 $ cd models/
 $ python dl-weights.py
 ```
+
+## Credits
+Many thanks to the following projects:
+
+- https://github.com/diegoinacio/object-detection-flask-opencv
+- https://github.com/mallorbc/whisper_mic/
+- https://github.com/Akul-AI/rlvoice-1/
