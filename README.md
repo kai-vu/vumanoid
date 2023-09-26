@@ -7,7 +7,7 @@ Starter code for Vrije Universiteit Intro to AI creative crafting / hackathon da
 Create and activate an virtual environment, as follows:
 
 ```bash
-$ gti clone git@github.com:kai-vu/vumanoid.git
+$ git clone git@github.com:kai-vu/vumanoid.git
 $ cd vumanoid/
 $ python -m venv env
 $ env/bin/activate
