@@ -1,19 +1,16 @@
-# Real-time object detection application
+# VUmanoid 🤖
 
-Web application for _real-time_ object detection on video streaming via web browser.
-
-[![layout](_source/layout.jpg)](https://www.youtube.com/watch?v=3JUA47-QOKo&t=59s)
-
-Watch the [demo video](https://www.youtube.com/watch?v=3JUA47-QOKo&t=59s).
+Starter code for Vrije Universiteit Intro to AI creative crafting / hackathon day.
 
 ## Installation
 
 Create and activate an virtual environment, as follows:
 
 ```bash
-$ cd cloned/directory/
+$ gti clone git@github.com:kai-vu/vumanoid.git
+$ cd vumanoid/
 $ python -m venv env
-$ env/Scripts/activate
+$ env/bin/activate
 ```
 
 After have installed and activated the environment, install all the dependencies:
@@ -28,8 +25,6 @@ After that, you can run the _following command_ and access the application at [1
 $ python application.py
 ```
 
-*obs.: This application was tested only on *Google Chrome*.*
-
 ## Download model
 
 To download the `yolov3.weights`, just run:
@@ -38,11 +33,3 @@ To download the `yolov3.weights`, just run:
 $ cd models/
 $ python dl-weights.py
 ```
-
-## Usage
-
-- **Camera preview**: Enables and disables the webcam preview.
-- **Run detection model**: Enables and disables the detection model.
-- **Exposure**: Buttons which increase or decrease camera exposure stops by 1.
-- **Contrast**: Buttons which increase or decrease camera contrast stops by 4.
-- **Reset camera**: Reset all camera settings based on _camera_settings.log_ file.

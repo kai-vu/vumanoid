@@ -1,5 +1,17 @@
-Flask==2.3.2
-Flask-Bootstrap==3.3.7.1
-numpy==1.23.0
-opencv-python==4.6.0.66
-requests==2.31.0
+Flask
+Flask-Bootstrap
+numpy
+opencv-python
+requests
+pyaudio
+SpeechRecognition
+pydub
+torch
+tqdm
+pillow
+whisper
+editdistance
+rlvoice-1
+git+https://github.com/openai/whisper.git
+--extra-index-url https://download.pytorch.org/whl/cu113
+torch

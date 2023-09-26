@@ -1,11 +1,8 @@
 import os
 import cv2
+import logging
 
-
-attrib_list = {
-    "exposure": cv2.CAP_PROP_EXPOSURE,
-    "contrast": cv2.CAP_PROP_CONTRAST
-}
+attrib_list = {"exposure": cv2.CAP_PROP_EXPOSURE, "contrast": cv2.CAP_PROP_CONTRAST}
 
 
 def check_settings():
@@ -26,19 +23,18 @@ def check_settings():
                 VIDEO_CHECK.set(attrib_list[attrib[0]], eval(attrib[1]))
         f.close()
 
-    print("*"*28)
-    print("* Checking camera settings *")
-    print("*"*28)
+    logging.info("Checking camera settings")
     for attrib, index in attrib_list.items():
-        print(f"{attrib} = {VIDEO_CHECK.get(index)}")
+        logging.info(f"camera setting {attrib} = {VIDEO_CHECK.get(index)}")
 
     VIDEO_CHECK.release()
 
 
 def reset_settings():
     if not os.path.exists("camera_settings.log"):
-        print("'camera_settings.log' does not exist!")
-        print("Verify your camera settings!")
+        logging.INFO(
+            "'camera_settings.log' does not exist! " "Verify your camera settings!"
+        )
         return False
     else:
         VIDEO_CHECK = cv2.VideoCapture(0)

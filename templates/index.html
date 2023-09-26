@@ -1,32 +1,54 @@
-{% extends "bootstrap/base.html" %} {% block title %} {{ TITLE }} {% endblock %}
+{% extends "bootstrap/base.html" %}
+{% block title %} {{ title }} {% endblock %}
 {% block styles %} {{ super() }}
 
 <!-- Custom styles -->
 <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}" />
 {% endblock %} {% block content %}
-<h1>{{ TITLE }}</h1>
-
 <div id="container">
-  <img id="videoElement" src="{{ url_for('video_feed') }}" />
-  <form id="control">
-    Camera preview:
-    <a id="cam-preview"><button class="btn btn-default">On/Off</button></a>
-    Flip horizontal:
-    <a id="flip-horizontal"><button class="btn btn-default">On/Off</button></a>
-    Run detection model:
-    <a id="use-model"><button class="btn btn-default">On/Off</button></a>
+  <div id="state-scroll">
+    <div id="state-wrap">
+      <div id="state" /></div>
+    </div>
+  </div>
+  <div>
+    <img id="videoElement" src="{{ url_for('video_feed') }}" width="100%" /><br />
+    <form id="control" style="font-size:0.9em">
+      <div class="setting">
+        <label for="cam_preview">Preview</label>
+        <input type="checkbox" {{'checked' if preview else ''}} id="cam_preview" />
+      </div>
+
+      <div class="setting">
+        <label for="cam_flip">Flip</label>
+        <input type="checkbox" {{'checked' if preview else ''}} id="cam_flip" />
+      </div>
+
+      <div class="setting">
+        <label for="cam_detect">Detect</label>
+        <input type="checkbox" {{'checked' if preview else ''}} id="cam_detect" />
+      </div>
+      
+      {% if platform != 'darwin' %}
+      <div class="setting">
+        <label for="exposure">Exposure</label>
+        <input type="range" id="cam_exposure" min="-5" max="5" value="0" step="1" />
+      </div>
+      
+      <div class="setting">
+        <label for="contrast">Contrast</label>
+        <input type="range" id="cam_contrast" min="-20" max="20" value="0" step="4" />
+      </div>
+      {% endif %}
+      
+      <div class="setting" style="vertical-align:bottom">
+        <a id="cam_reset"><button  class="btn btn-default">Reset</button></a>
+      </div>
+    </form>
     <br />
-    <br />
-    Exposure:
-    <a id="exposure-down"><button class="btn btn-default">-1</button></a>
-    <a id="exposure-up"><button class="btn btn-default">+1</button></a>
-    Contrast:
-    <a id="contrast-down"><button class="btn btn-default">-4</button></a>
-    <a id="contrast-up"><button class="btn btn-default">+4</button></a>
-    <br />
-    <br />
-    <a id="reset-cam"><button class="btn btn-default">Reset camera</button></a>
-  </form>
+    <img id="audioElement" src="{{ url_for('audio_feed') }}" />
+
+  </div>
 </div>
 {% endblock %} {% block scripts %}
 <!-- Imports -->
