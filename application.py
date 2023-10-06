@@ -3,11 +3,13 @@ from flask_bootstrap import Bootstrap
 import logging
 from datetime import datetime
 import platform
+import os
 
 from vision import VideoStreaming, reset_settings
 from hearing import AudioStreaming
 from speech import SpeechProduction
 from state import State
+from gpt import GPT
 
 app = Flask(__name__)
 Bootstrap(app)
@@ -16,21 +18,34 @@ logging.basicConfig(level=logging.INFO)
 
 # Configure setup
 TITLE = "VUmanoid"
-PREVIEW = False
+VIDEO_PREVIEW = True
+USE_AUDIO = True
+
 AUDIO = AudioStreaming(ok_speech_threshold=0.4)
-SPEECH = SpeechProduction(audio=AUDIO, rate=128, enabled=False)
-VIDEO = VideoStreaming(cam_index=0, preview=PREVIEW, 
+SPEECH = SpeechProduction(audio=AUDIO, rate=128, enabled=USE_AUDIO)
+VIDEO = VideoStreaming(cam_index=0, preview=VIDEO_PREVIEW, 
                        detect_faces = True, detect_objects = True)
 
 STATE = State(f"state-{datetime.now():%Y%m%d-%H%M%S}.txt")
 STATE.register_action('SAY', lambda content: SPEECH.speak(content))
 
-# Define behaviour (TODO: ChatGPT)
-def process_input(keyword, content):
-    if keyword == 'HEAR':
-        return STATE.output('SAY', f'I hear {content}')
-    if keyword == 'SEE':
-        return STATE.output('SAY', f'I see {content}')
+# Define behavior
+# def echo_input(keyword, content):
+#     if keyword == 'HEAR':
+#         return STATE.output('SAY', f'I hear {content}')
+#     if keyword == 'SEE':
+#         return STATE.output('SAY', f'I see {content}')
+# PROCESS_INPUT = echo_input
+
+persona = """You are a humanoid robot with sensors and actuators. You recieve inputs and respond with outputs that both start with a capitalized keyword. For now, the input keywords are HEAR (for audio speech transcription) and SEE (for object detection, encoded as emojis); the output keywords are WAIT (no content) and SAY (for speech production). Your task is to answer questions about the things you see, but only when you hear a question. For example, if you get:
+    SEE 🚲
+you respond: WAIT
+    HEAR How many wheels does it have?
+you respond: SAY A bicycle has two wheels.
+"""
+gpt = GPT(STATE, persona, os.getenv("OPENAI_API_KEY"))
+PROCESS_INPUT = gpt.respond
+
 
 # Register web interface
 @app.route("/")
@@ -62,7 +77,7 @@ def get_or_set_state():
 
         if message[0] == '<':
             keyword, content = message[1:].split(' ', 1)
-            process_input(keyword, content)
+            PROCESS_INPUT(keyword, content)
 
         return Response(status = 200) 
     elif request.method == 'GET':
