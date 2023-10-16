@@ -24,6 +24,7 @@ After that, you can run the _following command_ and access the application at [1
 ```bash
 $ python application.py
 ```
+To stop the server, press `Ctrl + C`.
 
 ## Download model
 
