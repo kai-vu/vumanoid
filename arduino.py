@@ -10,16 +10,17 @@ class Arduino():
     Models an Arduino connection
     """
 
-    def __init__(self, serial_port='/dev/ttyACM0', baud_rate=9600,
+    def __init__(self, enabled = True, serial_port='/dev/ttyACM0', baud_rate=9600,
             read_timeout=5, pin_modes = ()):
         """
         Initializes the serial connection to the Arduino board
         """
-        self.conn = serial.Serial(serial_port, baud_rate)
-        self.conn.timeout = read_timeout # Timeout for readline()
-        if pin_modes:
-            for pin, mode in pin_modes.items():
-                self.set_pin_mode(pin, mode)
+        if enabled:
+            self.conn = serial.Serial(serial_port, baud_rate)
+            self.conn.timeout = read_timeout # Timeout for readline()
+            if pin_modes:
+                for pin, mode in pin_modes.items():
+                    self.set_pin_mode(pin, mode)
 
     def set_pin_mode(self, pin_number, mode):
         """

@@ -19,7 +19,7 @@ logging.basicConfig(level=logging.INFO)
 
 # Configure setup
 TITLE = "VUmanoid"
-VIDEO_PREVIEW = USE_SPEECH = USE_MIC = False
+VIDEO_PREVIEW = USE_SPEECH = USE_MIC = USE_ARDUINO = False
 
 AUDIO = MicrophoneStreaming(ok_speech_threshold=0.4, enabled=USE_MIC)
 SPEECH = SpeechProduction(audio=AUDIO, rate=128, enabled=USE_SPEECH, 
@@ -27,7 +27,7 @@ SPEECH = SpeechProduction(audio=AUDIO, rate=128, enabled=USE_SPEECH,
 VIDEO = VideoStreaming(cam_index=0, preview=VIDEO_PREVIEW, 
                        dnn_model = 'yolov3-tiny',
                        detect_faces = True, detect_objects = True)
-ARDUINO = Arduino('/dev/cu.usbmodem142101')
+ARDUINO = Arduino(serial_port='/dev/cu.usbmodem142101', enabled = USE_ARDUINO)
 
 STATE = State(f"state-{datetime.now():%Y%m%d-%H%M%S}.txt")
 STATE.register_action('SAY', lambda content: SPEECH.speak(content))
