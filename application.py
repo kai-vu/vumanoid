@@ -6,10 +6,11 @@ import platform
 import os
 
 from vision import VideoStreaming, reset_settings
-from hearing import AudioStreaming
+from hearing import MicrophoneStreaming
 from speech import SpeechProduction
 from state import State
 from gpt import GPT
+from arduino import Arduino
 
 app = Flask(__name__)
 Bootstrap(app)
@@ -18,13 +19,15 @@ logging.basicConfig(level=logging.INFO)
 
 # Configure setup
 TITLE = "VUmanoid"
-VIDEO_PREVIEW = True
-USE_AUDIO = True
+VIDEO_PREVIEW = USE_SPEECH = USE_MIC = False
 
-AUDIO = AudioStreaming(ok_speech_threshold=0.4)
-SPEECH = SpeechProduction(audio=AUDIO, rate=128, enabled=USE_AUDIO)
+AUDIO = MicrophoneStreaming(ok_speech_threshold=0.4, enabled=USE_MIC)
+SPEECH = SpeechProduction(audio=AUDIO, rate=128, enabled=USE_SPEECH, 
+                          model='tiny')
 VIDEO = VideoStreaming(cam_index=0, preview=VIDEO_PREVIEW, 
+                       dnn_model = 'yolov3-tiny',
                        detect_faces = True, detect_objects = True)
+ARDUINO = Arduino('/dev/cu.usbmodem142101')
 
 STATE = State(f"state-{datetime.now():%Y%m%d-%H%M%S}.txt")
 STATE.register_action('SAY', lambda content: SPEECH.speak(content))
@@ -56,17 +59,15 @@ def home():
 
 @app.route("/video_feed")
 def video_feed():
-    """
-    Video streaming route.
-    """
     return Response(VIDEO.show(), mimetype="multipart/x-mixed-replace; boundary=frame")
 
 @app.route("/audio_feed")
 def audio_feed():
-    """
-    Audio streaming route.
-    """
     return Response(AUDIO.show(), mimetype="multipart/x-mixed-replace; boundary=frame")
+
+@app.route("/arduino_feed")
+def arduino_feed():
+    return Response(ARDUINO.show(), mimetype="multipart/x-mixed-replace; boundary=frame")
 
 @app.route("/state", methods=["POST", "GET"])
 def get_or_set_state():
@@ -82,6 +83,14 @@ def get_or_set_state():
         return Response(status = 200) 
     elif request.method == 'GET':
         return STATE.read()
+
+@app.route("/secret_set", methods=["POST"])
+def secret_set():
+    data = request.get_json(force=True)
+    api_key = data.get('secret')
+    if api_key:
+        with open('SECRETKEY', 'w') as fw:
+            print(api_key, file=fw)
 
 # Camera settings
 @app.route("/camera_set", methods=["POST"])

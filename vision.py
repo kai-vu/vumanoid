@@ -4,6 +4,9 @@ import cv2
 import numpy as np
 import logging
 from datetime import datetime
+import requests
+from tqdm import tqdm
+from urllib.parse import urlparse
 
 from camera_settings import check_settings, reset_settings
 from state import State
@@ -12,8 +15,24 @@ log = logging.getLogger(__name__)
 
 FONT = cv2.FONT_HERSHEY_PLAIN
 
+def download(url):
+    fname = os.path.basename(urlparse(url).path)
+    path = os.path.join("models", fname)
+    if not os.path.exists(path):
+        log.info(f'Downloading {url}')
+        response = requests.get(url, allow_redirects=True, stream=True)
+        total_size_in_bytes = int(response.headers.get('content-length', 0))
+        block_size = 1024 #1 Kibibyte
+        progress_bar = tqdm(total=total_size_in_bytes, unit='iB', unit_scale=True)
+        with open(path, 'wb') as file:
+            for data in response.iter_content(block_size):
+                progress_bar.update(len(data))
+                file.write(data)
+        progress_bar.close()
+
+
 class ObjectDetection:
-    def __init__(self, detect_faces = True, detect_objects = True, use_emojis=True):
+    def __init__(self, detect_faces = True, detect_objects = True, use_emojis=True, dnn_model = 'yolov3-tiny'):
         self.detect_objects = detect_objects
         self.detect_faces = detect_faces
         self.use_emojis = use_emojis
@@ -22,11 +41,13 @@ class ObjectDetection:
         PROJECT_PATH = os.path.abspath(os.getcwd())
         MODELS_PATH = os.path.join(PROJECT_PATH, "models")
 
-        model = 'yolov3-tiny'
-        log.info(f'Loading DNN model {model}')
+        log.info(f'Loading DNN model {dnn_model}')
+        # see also https://github.com/pjreddie/darknet/tree/master/cfg
+        download(f"https://raw.githubusercontent.com/pjreddie/darknet/master/cfg/{dnn_model}.cfg")
+        download(f"https://pjreddie.com/media/files/{dnn_model}.weights")
         self.MODEL = cv2.dnn.readNet(
-            os.path.join(MODELS_PATH, f"{model}.weights"),
-            os.path.join(MODELS_PATH, f"{model}.cfg"),
+            os.path.join(MODELS_PATH, f"{dnn_model}.weights"),
+            os.path.join(MODELS_PATH, f"{dnn_model}.cfg"),
         )
 
         self.CLASSES = []
@@ -44,6 +65,11 @@ class ObjectDetection:
         ]
         self.COLORS = np.random.uniform(0, 255, size=(len(self.CLASSES), 3))
         self.COLORS /= (np.sum(self.COLORS**2, axis=1) ** 0.5 / 255)[np.newaxis].T
+
+        face_model = 'haarcascade_frontalface_default.xml'
+        # see also: https://github.com/opencv/opencv/tree/master/data/haarcascades
+        download(f'https://raw.githubusercontent.com/opencv/opencv/master/data/haarcascades/{face_model}')
+        self.face_cascade = cv2.CascadeClassifier(os.path.join("models", face_model))
 
         self.last_seen_time = {}
 
@@ -83,11 +109,8 @@ class ObjectDetection:
         indexes = list(cv2.dnn.NMSBoxes(boxes, confidences, 0.5, 0.4))
 
         if self.detect_faces:
-            face_cascade = cv2.CascadeClassifier(
-                "models/haarcascade_frontalface_default.xml"
-            )
             gray = cv2.cvtColor(snap, cv2.COLOR_BGR2GRAY)
-            faces, face_confidences = face_cascade.detectMultiScale2(gray, 1.1, 4)
+            faces, face_confidences = self.face_cascade.detectMultiScale2(gray, 1.1, 4)
             boxes += list(faces)
             confidences += [i / 100 for i in face_confidences]
             for _ in range(len(faces)):

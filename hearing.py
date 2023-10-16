@@ -18,7 +18,7 @@ import re
 
 from state import State
 
-MICIMG = Image.open("mic.png").convert("RGBA")
+MIC_IMG = Image.open("static/mic.png").convert("RGBA")
 
 log = logging.getLogger(__name__)
 
@@ -26,9 +26,10 @@ def tokenize(s: str):
     s = s.translate(str.maketrans('', '', string.punctuation))
     return s.lower().split()
 
-class AudioStreaming:
+class MicrophoneStreaming:
     def __init__(
         self,
+        enabled=True,
         model: str = "tiny",
         device: str = ("cuda" if torch.cuda.is_available() else "cpu"),
         english: bool = True,
@@ -84,6 +85,9 @@ class AudioStreaming:
         self.recorder.energy_threshold = self.energy
         self.recorder.pause_threshold = self.pause
         self.recorder.dynamic_energy_threshold = self.dynamic_energy
+
+        if not enabled:
+            return
 
         with self.source:
             self.recorder.adjust_for_ambient_noise(self.source)
@@ -192,11 +196,11 @@ class AudioStreaming:
         while True:
             try:
                 with source:
-                    buffer = self.source.stream.read(source.CHUNK)
+                    buffer = source.stream.read(source.CHUNK)
                     energy = audioop.rms(buffer, source.SAMPLE_WIDTH)
                     rel = min(1, max(0, energy / 5000))
                     
-                    w, h = MICIMG.size
+                    w, h = MIC_IMG.size
                     im = Image.new("RGBA", (400,h))
 
                     # Draw microphone level
@@ -205,7 +209,7 @@ class AudioStreaming:
                     size = (h / 1.5) - int((h / 1.5) * rel)
                     color = (255, 0, 0) if self.locked() else (0, 128, 0)
                     draw.rectangle(((0, size), (w-1, h)), fill=color)
-                    im.paste(MICIMG, mask=MICIMG)
+                    im.paste(MIC_IMG, mask=MIC_IMG)
 
                     # Draw last status
                     font = ImageFont.load_default()

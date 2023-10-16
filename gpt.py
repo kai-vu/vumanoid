@@ -1,5 +1,6 @@
 import logging
 import openai
+import os
 
 from state import State
 
@@ -9,8 +10,14 @@ class GPT:
     def __init__(self, state_obj: State, persona: str, api_key:str):
         self.state = state_obj
         self.persona = persona
+        if api_key:
+            with open('SECRETKEY', 'w') as fw:
+                print(api_key, file=fw)
+        elif os.path.exists('SECRETKEY'):
+            api_key = open('SECRETKEY').read().strip()
         log.info(f'Using OpenAI API key {api_key}')
         openai.api_key = api_key
+        
     
     def respond(self, keyword, content):
         old_messages = [
@@ -28,5 +35,8 @@ class GPT:
         )
         reply = completion.choices[0].message.content.replace('\n','')
         log.info(f'Got reply {reply}')
-        reply_keyword, reply_content = reply.split(' ', 1)
+        if ' ' in reply:
+            reply_keyword, reply_content = reply.split(' ', 1)
+        else:
+            reply_keyword, reply_content = reply, ''
         return self.state.output(reply_keyword, reply_content)

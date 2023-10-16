@@ -10,8 +10,16 @@
     <div id="state-wrap">
       <div id="state" /></div>
     </div>
+    <div class="input-box">
+      <input type="text" placeholder="Create Event" id="event"/>
+      <button>Create</button> 
+    </div>
   </div>
   <div>
+    <div class="input-box">
+      <input type="text" placeholder="OpenAI Secret Key" id="secret"/><br />
+      <button>Set</button> 
+    </div>
     <img id="videoElement" src="{{ url_for('video_feed') }}" width="100%" /><br />
     <form id="control" style="font-size:0.9em">
       <div class="setting">
@@ -46,7 +54,8 @@
       </div>
     </form>
     <br />
-    <img id="audioElement" src="{{ url_for('audio_feed') }}" />
+    <img id="audioElement" src="{{ url_for('audio_feed') }}" /><br />
+    <img id="arduino" src="{{ url_for('arduino_feed') }}" width="100%" /><br />
 
   </div>
 </div>

@@ -18,8 +18,8 @@ body {
   overflow-y: scroll;
 }
 #state-wrap {
-  width: 100%;
-  min-height:100%;
+  width: 90%;
+  min-height:90%;
   display: flex;
   background: rgb(255, 249, 236)
 }
@@ -54,4 +54,14 @@ body {
 .setting input {
   display: block;
   width:64px; 
+}
+
+.input-box {
+  display: flex; 
+}
+.input-box > input {
+  flex: 1;
+}
+.input-box > button {
+  float: left;
 }
