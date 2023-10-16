@@ -56,7 +56,8 @@ class ObjectDetection:
         
         if self.use_emojis:
             self.EMOJIS = []
-            with open(os.path.join(MODELS_PATH, "coco.emojis"), "r") as f:
+            emoji_path = os.path.join(MODELS_PATH, "coco.emojis")
+            with open(emoji_path, encoding='utf-8', errors='ignore') as f:
                 self.EMOJIS = [line.strip() for line in f.readlines()]
 
         self.OUTPUT_LAYERS = [
