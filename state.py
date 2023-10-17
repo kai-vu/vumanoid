@@ -9,11 +9,11 @@ class State:
         self.actions.setdefault(keyword, []).append(action)
     
     def read(self):
-        return open(self.fname).read()
+        return open(self.fname, encoding='utf-8').read()
 
     def log(self, message):
         # Write to log
-        with open(self.fname, 'a') as fw:
+        with open(self.fname, 'a', encoding='utf-8') as fw:
             print(message, file=fw)
         
         # Do action
