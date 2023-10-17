@@ -26,15 +26,6 @@ $ python application.py
 ```
 To stop the server, press `Ctrl + C`.
 
-## Download model
-
-To download the `yolov3.weights`, just run:
-
-```bash
-$ cd models/
-$ python dl-weights.py
-```
-
 ## Credits
 Many thanks to the following projects:
 
