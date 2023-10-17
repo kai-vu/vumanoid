@@ -74,7 +74,7 @@ def arduino_feed():
 @app.route("/state", methods=["POST", "GET"])
 def get_or_set_state():
     if request.method == 'POST':
-        message = request.get_data().decode('utf8')
+        message = request.get_data().decode('utf-8')
         logging.info(message)
         STATE.log(message)
 
