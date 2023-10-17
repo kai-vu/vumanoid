@@ -18,6 +18,8 @@ Bootstrap(app)
 logging.basicConfig(level=logging.INFO)
 
 # Configure setup
+# dnn_model can be chosen among the list found on https://github.com/pjreddie/darknet/tree/master/cfg
+
 TITLE = "VUmanoid"
 VIDEO_PREVIEW = USE_SPEECH = USE_MIC = USE_ARDUINO = False
 

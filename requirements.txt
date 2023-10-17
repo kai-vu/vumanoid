@@ -18,3 +18,5 @@ torch
 openai
 tqdm
 pyserial>=2.7
+chardet
+pygithub

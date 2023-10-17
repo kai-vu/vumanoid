@@ -10,6 +10,10 @@ from urllib.parse import urlparse
 
 from camera_settings import check_settings, reset_settings
 from state import State
+from github import Github
+
+available_models= [m.name.split('.')[0] for m in Github().get_user('pjreddie').get_repo('darknet').get_contents('cfg')]
+
 
 log = logging.getLogger(__name__)
 
@@ -42,6 +46,10 @@ class ObjectDetection:
         MODELS_PATH = os.path.join(PROJECT_PATH, "models")
 
         log.info(f'Loading DNN model {dnn_model}')
+        if dnn_model not in (available_models):
+            dnn_model = 'yolov3-tiny'
+            print("model not found, defaulting to 'yolov3-tiny'")
+
         # see also https://github.com/pjreddie/darknet/tree/master/cfg
         download(f"https://raw.githubusercontent.com/pjreddie/darknet/master/cfg/{dnn_model}.cfg")
         download(f"https://pjreddie.com/media/files/{dnn_model}.weights")
