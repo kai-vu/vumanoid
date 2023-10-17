@@ -5,7 +5,7 @@ from datetime import datetime
 import platform
 import os
 
-from vision import VideoStreaming, reset_settings
+from vision import VideoStreaming, ObjectDetection, reset_settings
 from hearing import MicrophoneStreaming
 from speech import SpeechProduction
 from state import State
@@ -22,14 +22,17 @@ logging.basicConfig(level=logging.INFO)
 
 TITLE = "VUmanoid"
 VIDEO_PREVIEW = USE_SPEECH = USE_MIC = USE_ARDUINO = False
+USE_ARDUINO = True
 
 AUDIO = MicrophoneStreaming(ok_speech_threshold=0.4, enabled=USE_MIC)
 SPEECH = SpeechProduction(audio=AUDIO, rate=128, enabled=USE_SPEECH, 
                           model='tiny')
-VIDEO = VideoStreaming(cam_index=0, preview=VIDEO_PREVIEW, 
-                       dnn_model = 'yolov3-tiny',
-                       detect_faces = True, detect_objects = True)
-ARDUINO = Arduino(serial_port='/dev/cu.usbmodem142101', enabled = USE_ARDUINO)
+OBJECT_DETECTION = ObjectDetection(dnn_model = 'yolov3-tiny', detect_faces = True, 
+                                   detect_objects = True)
+VIDEO = VideoStreaming(OBJECT_DETECTION, cam_index=0, preview=VIDEO_PREVIEW)
+                       
+ARDUINO = Arduino(serial_port='/dev/cu.usbmodem142101', enabled = USE_ARDUINO,
+                  pin_modes={13:'O'})
 
 STATE = State(f"state-{datetime.now():%Y%m%d-%H%M%S}.txt")
 STATE.register_action('SAY', lambda content: SPEECH.speak(content))

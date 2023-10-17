@@ -2,8 +2,17 @@ from PIL import Image, ImageDraw, ImageFont
 import serial
 import io
 import time
+import logging
+
+log = logging.getLogger(__name__)
 
 BOARD_IMG = Image.open("static/arduino.png").convert("RGBA")
+def get_pin_img_pos(pin_number, analog=False):
+    offset = pin_number * 15
+    if analog:
+        return (361 + offset, 312)
+    else:
+        return (434 - offset, 40) if (pin_number < 8) else (422 - offset, 40)
 
 class Arduino():
     """
@@ -15,6 +24,7 @@ class Arduino():
         """
         Initializes the serial connection to the Arduino board
         """
+        self.pin_modes = {}
         if enabled:
             self.conn = serial.Serial(serial_port, baud_rate)
             self.conn.timeout = read_timeout # Timeout for readline()
@@ -32,6 +42,7 @@ class Arduino():
         """
         command = (''.join(('M',mode,str(pin_number)))).encode()
         self.conn.write(command)
+        self.pin_modes[pin_number] = mode
 
     def digital_read(self, pin_number):
         """
@@ -82,6 +93,12 @@ class Arduino():
     def show(self):
         while True:
             im = BOARD_IMG
+            draw = ImageDraw.Draw(im)
+            font = ImageFont.load_default()
+            
+            for pin, mode in self.pin_modes.items():
+                x, y = get_pin_img_pos(pin, analog=False)
+                draw.text((x+8, y-30), mode, font=font, fill=(0, 0, 0))
 
             arr = io.BytesIO()
             im.save(arr, format="png")

@@ -151,11 +151,11 @@ class ObjectDetection:
 
 
 class VideoStreaming(object):
-    def __init__(self, cam_index=0, preview=True, **kwargs):
+    def __init__(self, object_detection_model, cam_index=0, preview=True):
         super(VideoStreaming, self).__init__()
         self.VIDEO = cv2.VideoCapture(cam_index)
 
-        self.MODEL = ObjectDetection(**kwargs)
+        self.MODEL = object_detection_model
 
         self._preview = preview
         self._flipH = False
