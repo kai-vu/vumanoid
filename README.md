@@ -26,6 +26,15 @@ $ python application.py
 ```
 To stop the server, press `Ctrl + C`.
 
+## How to use MindMup
+
+1. Go [mindmup.com](https://www.mindmup.com/)
+2. Click "Create Free Map"
+3. Get your creative idea on the canvas!
+
+Once your finished with your idea, you can go to File -> Download as -> MindMup and save the file to this (mindmup) folder.
+The application will parse the file automatically.
+
 ## Credits
 Many thanks to the following projects:
 

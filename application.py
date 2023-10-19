@@ -11,6 +11,7 @@ from speech import SpeechProduction
 from state import State
 from gpt import GPT
 from arduino import Arduino
+from mindmup import MindMup
 
 app = Flask(__name__)
 Bootstrap(app)
@@ -33,6 +34,7 @@ VIDEO = VideoStreaming(OBJECT_DETECTION, cam_index=0, preview=VIDEO_PREVIEW)
                        
 ARDUINO = Arduino(serial_port='/dev/cu.usbmodem142101', enabled = USE_ARDUINO,
                   pin_modes={13:'O'})
+MINDMUP = MindMup('mindmup/tutorial.mup')
 
 STATE = State(f"state-{datetime.now():%Y%m%d-%H%M%S}.txt")
 STATE.register_action('SAY', lambda content: SPEECH.speak(content))
@@ -51,7 +53,8 @@ you respond: WAIT
     HEAR How many wheels does it have?
 you respond: SAY A bicycle has two wheels.
 """
-gpt = GPT(STATE, persona, os.getenv("OPENAI_API_KEY"))
+mindmap = MINDMUP.parse('mindmup/tutorial.mup')
+gpt = GPT(STATE, persona, mindmap, os.getenv("OPENAI_API_KEY"))
 PROCESS_INPUT = gpt.respond
 
 

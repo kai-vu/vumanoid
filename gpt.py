@@ -7,9 +7,10 @@ from state import State
 log = logging.getLogger(__name__)
 
 class GPT:
-    def __init__(self, state_obj: State, persona: str, api_key:str):
+    def __init__(self, state_obj: State, persona: str, mindmap: str, api_key:str):
         self.state = state_obj
         self.persona = persona
+        self.mindmap = mindmap
         if api_key:
             with open('SECRETKEY', 'w') as fw:
                 print(api_key, file=fw)
@@ -28,7 +29,7 @@ class GPT:
         completion = openai.ChatCompletion.create(
             model="gpt-3.5-turbo",
             messages=(
-                [{"role": "system", "content": self.persona}]
+                [{"role": "system", "content": self.persona + self.mindmap}]
                 + old_messages
                 + [{"role": "user", "content": f"{keyword} {content}"}]
             )

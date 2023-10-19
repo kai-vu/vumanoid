@@ -1,0 +1,62 @@
+{
+  "formatVersion": 3,
+  "id": "root",
+  "ideas": {
+    "1": {
+      "title": "What should I do?",
+      "id": 1,
+      "attr": {
+        "position": [
+          3,
+          -102,
+          1
+        ]
+      },
+      "ideas": {
+        "1": {
+          "title": "Do I see a human?",
+          "id": 3,
+          "attr": {
+            "position": [
+              211,
+              50,
+              1
+            ]
+          },
+          "ideas": {
+            "1": {
+              "title": "Say Hello!",
+              "id": 4,
+              "attr": {
+                "position": [
+                  224,
+                  33,
+                  1
+                ],
+                "parentConnector": {
+                  "label": "yes"
+                }
+              }
+            },
+            "2": {
+              "title": "Find something else to do!",
+              "id": 5,
+              "attr": {
+                "position": [
+                  111,
+                  123,
+                  2
+                ],
+                "parentConnector": {
+                  "label": "no"
+                }
+              },
+              "ideas": {}
+            }
+          }
+        }
+      }
+    }
+  },
+  "title": "What should I do?"
+}
