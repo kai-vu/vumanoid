@@ -2,6 +2,8 @@
 
 Starter code for Vrije Universiteit Intro to AI creative crafting / hackathon day.
 
+For more information, check out the [wiki](https://github.com/kai-vu/vumanoid/wiki)!
+
 ## Installation
 
 Create and activate an virtual environment, as follows:
