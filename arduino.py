@@ -14,16 +14,14 @@ def get_pin_img_pos(pin_number, analog=False):
     else:
         return (434 - offset, 40) if (pin_number < 8) else (422 - offset, 40)
 
-ports = list(serial.tools.list_ports.comports())
-for p in ports:
-    print (p)
+port = list(serial.tools.list_ports.comports())[0].name
 
 class Arduino():
     """
     Models an Arduino connection
     """
 
-    def __init__(self, enabled = True, serial_port='COM5', baud_rate=9600,
+    def __init__(self, enabled = True, serial_port=port, baud_rate=9600,
             read_timeout=5, pin_modes = ()):
         """
         Initializes the serial connection to the Arduino board
