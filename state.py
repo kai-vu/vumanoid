@@ -17,7 +17,10 @@ class State:
             print(message, file=fw)
         
         # Do action
-        keyword, content = message.split(' ', 1)
+        if ' ' in message:
+            keyword, content = message.split(' ', 1)
+        else:
+            keyword, content = '', message
         if keyword[0] == '>':
             for action in self.actions.get(keyword[1:]):
                 action(content)
