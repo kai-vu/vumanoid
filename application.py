@@ -39,6 +39,7 @@ you respond: WAIT
     HEAR How many wheels does it have?
 you respond: SAY A bicycle has two wheels.
 """
+
 GPT = GPTConnection(STATE, persona, MINDMAP.parse(), os.getenv("OPENAI_API_KEY"))
 PROCESS_INPUT = GPT.respond
 

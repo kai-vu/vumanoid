@@ -37,7 +37,7 @@ void set_pin_mode(int pin_number, char mode){
         case 'P':
             pinMode(pin_number, INPUT_PULLUP);
             break;
-    }
+    }x½
 }
 
 void digital_read(int pin_number){
