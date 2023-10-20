@@ -21,8 +21,7 @@ logging.basicConfig(level=logging.INFO)
 
 # Configure setup
 TITLE = "VUmanoid"
-VIDEO_PREVIEW = USE_SPEECH = USE_MIC = USE_ARDUINO = True
-USE_ARDUINO = True
+VIDEO_PREVIEW = USE_SPEECH = USE_MIC = USE_ARDUINO = False
 
 AUDIO = MicrophoneStreaming(ok_speech_threshold=0.4, enabled=USE_MIC, model='tiny')
 SPEECH = SpeechProduction(audio=AUDIO, rate=128, enabled=USE_SPEECH)
@@ -43,7 +42,7 @@ you respond: SAY A bicycle has two wheels.
 GPT = GPTConnection(STATE, persona, MINDMAP.parse(), os.getenv("OPENAI_API_KEY"))
 PROCESS_INPUT = GPT.respond
 
-ARDUINO = Arduino(serial_port='/dev/cu.usbmodem142101', enabled = USE_ARDUINO,
+ARDUINO = Arduino(serial_port='/dev/cu.usbmodem142301', enabled = USE_ARDUINO,
                   pin_modes={13:'O'})
 
 # Register web interface
