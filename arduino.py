@@ -33,6 +33,7 @@ class Arduino():
             try:
                 self.conn = serial.Serial(serial_port, baud_rate)
                 self.conn.timeout = read_timeout # Timeout for readline()
+                time.sleep(2)
                 if pin_modes:
                     for pin, mode in pin_modes.items():
                         self.set_pin_mode(pin, mode)

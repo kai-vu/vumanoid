@@ -43,8 +43,13 @@ you respond: SAY A bicycle has two wheels.
 GPT = GPTConnection(STATE, persona, MINDMAP.parse(), os.getenv("OPENAI_API_KEY"))
 PROCESS_INPUT = GPT.respond
 
+# To test the arduino, find the right serial port and enable it
+USE_ARDUINO = False
 ARDUINO = Arduino(serial_port='/dev/cu.usbmodem142301', enabled = USE_ARDUINO,
                   pin_modes={13:'O'})
+if USE_ARDUINO:
+    # This registers an action to control the LED with "LED 1" and "LED 0"
+    STATE.register_action('LED', lambda c: ARDUINO.digital_write(13, int(c)))
 
 # Register web interface
 @app.route("/")
