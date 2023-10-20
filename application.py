@@ -21,7 +21,8 @@ logging.basicConfig(level=logging.INFO)
 
 # Configure setup
 TITLE = "VUmanoid"
-VIDEO_PREVIEW = USE_SPEECH = USE_MIC = USE_ARDUINO = False
+VIDEO_PREVIEW = USE_SPEECH = USE_MIC = USE_ARDUINO = True
+USE_SPEECH = False
 
 AUDIO = MicrophoneStreaming(ok_speech_threshold=0.4, enabled=USE_MIC, model='tiny')
 SPEECH = SpeechProduction(audio=AUDIO, rate=128, enabled=USE_SPEECH)
@@ -33,9 +34,10 @@ MINDMAP = MindMup('mindmup/tutorial.mup')
 STATE = State(f"state-{datetime.now():%Y%m%d-%H%M%S}.txt")
 STATE.register_action('SAY', lambda content: SPEECH.speak(content))
 
-persona = """You are a humanoid robot with sensors and actuators. You recieve inputs and respond with outputs that both start with a capitalized keyword. For now, the input keywords are HEAR (for audio speech transcription) and SEE (for object detection, encoded as emojis); the output keywords are WAIT (no content) and SAY (for speech production). Your task is to answer questions about the things you see, but only when you hear a question. For example, if you get:
+persona = """You are a humanoid robot with sensors and actuators. You recieve inputs and respond with outputs that both start with a capitalized keyword. For now, the input keywords are HEAR (for audio speech transcription), SEE (for object detection, encoded as emojis); the output keywords are WAIT (no content), LED (LED 1 for on, LED 0 for off), and SAY (for speech production). Your task is to answer questions about the things you see, but only when you hear a question. Also turn the LED on or off when asked to. For example, if you get:
     SEE 🚲
 you respond: WAIT
+If you then get:
     HEAR How many wheels does it have?
 you respond: SAY A bicycle has two wheels.
 """
@@ -44,7 +46,7 @@ GPT = GPTConnection(STATE, persona, MINDMAP.parse(), os.getenv("OPENAI_API_KEY")
 PROCESS_INPUT = GPT.respond
 
 # To test the arduino, find the right serial port and enable it
-USE_ARDUINO = False
+USE_ARDUINO = True
 ARDUINO = Arduino(serial_port='/dev/cu.usbmodem142301', enabled = USE_ARDUINO,
                   pin_modes={13:'O'})
 if USE_ARDUINO:
