@@ -14,14 +14,16 @@ def get_pin_img_pos(pin_number, analog=False):
     else:
         return (434 - offset, 40) if (pin_number < 8) else (422 - offset, 40)
 
-port = list(serial.tools.list_ports.comports())[0].name
+ports = [p.name for p in serial.tools.list_ports.comports()]
+print('List of ports:')
+print(ports)
 
 class Arduino():
     """
     Models an Arduino connection
     """
 
-    def __init__(self, enabled = True, serial_port=port, baud_rate=9600,
+    def __init__(self, enabled = True, serial_port=None, baud_rate=9600,
             read_timeout=5, pin_modes = ()):
         """
         Initializes the serial connection to the Arduino board
@@ -49,6 +51,7 @@ class Arduino():
         - P for INPUT_PULLUP
         """
         command = (''.join(('M',mode,str(pin_number)))).encode()
+        log.info(f"Writing {command}")
         self.conn.write(command)
         self.pin_modes[pin_number] = mode
 
@@ -59,7 +62,9 @@ class Arduino():
         """
         command = (''.join(('RD', str(pin_number)))).encode()
         self.conn.write(command)
+        log.info(f"Writing {command}")
         line_received = self.conn.readline().decode().strip()
+        log.info(f"Read {line_received}")
         header, value = line_received.split(':') # e.g. D13:1
         if header == ('D'+ str(pin_number)):
             # If header matches
@@ -73,6 +78,7 @@ class Arduino():
         """
         command = (''.join(('WD', str(pin_number), ':',
             str(digital_value)))).encode()
+        log.info(f"Writing {command}")
         self.conn.write(command) 
      
     def analog_read(self, pin_number):
@@ -82,7 +88,9 @@ class Arduino():
         """
         command = (''.join(('RA', str(pin_number)))).encode()
         self.conn.write(command) 
+        log.info(f"Writing {command}")
         line_received = self.conn.readline().decode().strip()
+        log.info(f"Read {line_received}")
         header, value = line_received.split(':') # e.g. A4:1
         if header == ('A'+ str(pin_number)):
             # If header matches
@@ -96,6 +104,7 @@ class Arduino():
         """
         command = (''.join(('WA', str(pin_number), ':',
             str(analog_value)))).encode()
+        log.info(f"Writing {command}")
         self.conn.write(command) 
 
     def show(self):
@@ -121,9 +130,12 @@ if __name__ == '__main__':
 
     import time
 
-    a = Arduino()
+    a = Arduino(serial_port='/dev/cu.usbmodem142301')
     time.sleep(3)
     a.set_pin_mode(13,'O')
+    for i in range(100):
+        a.digital_write(13, (i % 2))
+        time.sleep(0.2)
     a.set_pin_mode(12,'I')
     time.sleep(1)
     a.digital_write(13,1)
