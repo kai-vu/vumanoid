@@ -26,12 +26,18 @@ class Arduino():
         """
         self.pin_modes = {}
         if enabled:
-            self.conn = serial.Serial(serial_port, baud_rate)
-            self.conn.timeout = read_timeout # Timeout for readline()
-            if pin_modes:
-                for pin, mode in pin_modes.items():
-                    self.set_pin_mode(pin, mode)
+            try:
+                self.conn = serial.Serial(serial_port, baud_rate)
+                self.conn.timeout = read_timeout # Timeout for readline()
+                if pin_modes:
+                    for pin, mode in pin_modes.items():
+                        self.set_pin_mode(pin, mode)
 
+            except Exception as e:
+                enabled = False
+                log.error(e)
+            
+            
     def set_pin_mode(self, pin_number, mode):
         """
         Performs a pinMode() operation on pin_number

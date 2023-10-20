@@ -6,18 +6,25 @@ from state import State
 
 log = logging.getLogger(__name__)
 
-class GPT:
+class GPTConnection:
     def __init__(self, state_obj: State, persona: str, api_key:str):
         self.state = state_obj
         self.persona = persona
+        
+        if not api_key:
+            api_key = self.get_key()
+        self.set_key(api_key)
+    
+    def get_key(self):
+        if os.path.exists('SECRETKEY'):
+            return open('SECRETKEY').read().strip()
+    
+    def set_key(self, api_key):
         if api_key:
             with open('SECRETKEY', 'w') as fw:
                 print(api_key, file=fw)
-        elif os.path.exists('SECRETKEY'):
-            api_key = open('SECRETKEY').read().strip()
-        log.info(f'Using OpenAI API key {api_key}')
-        openai.api_key = api_key
-        
+            log.info(f'Using OpenAI API key {api_key}')
+            openai.api_key = api_key
     
     def respond(self, keyword, content):
         old_messages = [

@@ -10,16 +10,20 @@
     <div id="state-wrap">
       <div id="state" /></div>
     </div>
-    <div class="input-box">
+    <form class="input-box" action="" onsubmit="return makeEvent();">
+      <select id="eventType">
+        <option>In</option>
+        <option>Out</option>
+      </select>
       <input type="text" placeholder="Create Event" id="event"/>
-      <button>Create</button> 
-    </div>
+      <button type="submit" >Create</button>
+    </form>
   </div>
   <div>
-    <div class="input-box">
-      <input type="text" placeholder="OpenAI Secret Key" id="secret"/><br />
-      <button>Set</button> 
-    </div>
+    <form class="input-box" action="" onsubmit="return setSecret();">
+      <input type="text" placeholder="OpenAI Secret Key" id="secret" value="{{secret}}">
+      <button type="submit">Set</button>
+    </form>
     <img id="videoElement" src="{{ url_for('video_feed') }}" width="100%" /><br />
     <form id="control" style="font-size:0.9em">
       <div class="setting">

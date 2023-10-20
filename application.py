@@ -9,17 +9,16 @@ from vision import VideoStreaming, ObjectDetection, reset_settings
 from hearing import MicrophoneStreaming
 from speech import SpeechProduction
 from state import State
-from gpt import GPT
+from gpt import GPTConnection
 from arduino import Arduino
 
 app = Flask(__name__)
+log = app.logger
 Bootstrap(app)
 
 logging.basicConfig(level=logging.INFO)
 
 # Configure setup
-# dnn_model can be chosen among the list found on https://github.com/pjreddie/darknet/tree/master/cfg
-
 TITLE = "VUmanoid"
 VIDEO_PREVIEW = USE_SPEECH = USE_MIC = USE_ARDUINO = False
 USE_ARDUINO = True
@@ -30,20 +29,9 @@ SPEECH = SpeechProduction(audio=AUDIO, rate=128, enabled=USE_SPEECH,
 OBJECT_DETECTION = ObjectDetection(dnn_model = 'yolov3-tiny', detect_faces = True, 
                                    detect_objects = True)
 VIDEO = VideoStreaming(OBJECT_DETECTION, cam_index=0, preview=VIDEO_PREVIEW)
-                       
-ARDUINO = Arduino(serial_port='/dev/cu.usbmodem142101', enabled = USE_ARDUINO,
-                  pin_modes={13:'O'})
 
 STATE = State(f"state-{datetime.now():%Y%m%d-%H%M%S}.txt")
 STATE.register_action('SAY', lambda content: SPEECH.speak(content))
-
-# Define behavior
-# def echo_input(keyword, content):
-#     if keyword == 'HEAR':
-#         return STATE.output('SAY', f'I hear {content}')
-#     if keyword == 'SEE':
-#         return STATE.output('SAY', f'I see {content}')
-# PROCESS_INPUT = echo_input
 
 persona = """You are a humanoid robot with sensors and actuators. You recieve inputs and respond with outputs that both start with a capitalized keyword. For now, the input keywords are HEAR (for audio speech transcription) and SEE (for object detection, encoded as emojis); the output keywords are WAIT (no content) and SAY (for speech production). Your task is to answer questions about the things you see, but only when you hear a question. For example, if you get:
     SEE 🚲
@@ -51,16 +39,19 @@ you respond: WAIT
     HEAR How many wheels does it have?
 you respond: SAY A bicycle has two wheels.
 """
-gpt = GPT(STATE, persona, os.getenv("OPENAI_API_KEY"))
-PROCESS_INPUT = gpt.respond
+GPT = GPTConnection(STATE, persona, os.getenv("OPENAI_API_KEY"))
+PROCESS_INPUT = GPT.respond
 
+ARDUINO = Arduino(serial_port='/dev/cu.usbmodem142101', enabled = USE_ARDUINO,
+                  pin_modes={13:'O'})
 
 # Register web interface
 @app.route("/")
 def home():
     return render_template(
         "index.html", 
-        title=TITLE, preview=VIDEO._preview, platform=platform.system().lower())
+        title=TITLE, preview=VIDEO._preview, platform=platform.system().lower(),
+        secret = str(GPT.get_key()))
 
 @app.route("/video_feed")
 def video_feed():
@@ -78,7 +69,7 @@ def arduino_feed():
 def get_or_set_state():
     if request.method == 'POST':
         message = request.get_data().decode('utf-8')
-        logging.info(message)
+        log.info(message)
         STATE.log(message)
 
         if message[0] == '<':
@@ -94,8 +85,9 @@ def secret_set():
     data = request.get_json(force=True)
     api_key = data.get('secret')
     if api_key:
-        with open('SECRETKEY', 'w') as fw:
-            print(api_key, file=fw)
+        GPT.set_key(api_key)
+        return Response(status = 200) 
+    return Response(status = 404) 
 
 # Camera settings
 @app.route("/camera_set", methods=["POST"])
@@ -103,27 +95,27 @@ def camera_set():
     data = request.get_json(force=True)
     if 'cam_preview' in data:
         VIDEO.preview = data['cam_preview']
-        app.logger.info(f"cam_preview: {VIDEO.preview}")
+        log.info(f"cam_preview: {VIDEO.preview}")
         return Response(status = 200)
     elif 'cam_flip' in data:
         VIDEO.flipH = data['cam_flip']
-        app.logger.info(f"cam_flip: {VIDEO.flipH}")
+        log.info(f"cam_flip: {VIDEO.flipH}")
         return Response(status = 200)
     elif 'cam_detect' in data:
         VIDEO.detect = data['cam_detect']
-        app.logger.info(f"cam_flip: {VIDEO.detect}")
+        log.info(f"cam_flip: {VIDEO.detect}")
         return Response(status = 200) 
     elif 'cam_exposure' in data:
         VIDEO.exposure = data['cam_exposure']
-        app.logger.info(f"cam_exposure: {VIDEO.exposure}")
+        log.info(f"cam_exposure: {VIDEO.exposure}")
         return Response(status = 200)
     elif 'cam_contrast' in data:
         VIDEO.contrast = data['cam_contrast']
-        app.logger.info(f"cam_contrast: {VIDEO.contrast}")
+        log.info(f"cam_contrast: {VIDEO.contrast}")
         return Response(status = 200)
     elif 'cam_reset' in data:
         reset_settings()
-        app.logger.info(f"cam_reset")
+        log.info(f"cam_reset")
         return Response(status = 200) 
 
 

@@ -3,7 +3,7 @@ function get_state() {
     .then((text) => {
       el = document.getElementById('state')
       html = text.split("\n").map((s) => 
-        `<div class="${s[0] == '<'? 'q' : 'a'}">${s.slice(1)}</div>`
+        s?`<div class="${s[0] == '<'? 'q' : 'a'}">${s.slice(1)}</div>`:''
       ).join('\n');
       el.innerHTML = html;
       box = el.parentElement.parentElement;
@@ -39,3 +39,20 @@ camera_setting("cam_detect",   "change", "checked")
 camera_setting("cam_exposure", "change", "value")
 camera_setting("cam_contrast", "change", "value")
 camera_setting("cam_reset",    "click", "value")
+
+function setSecret() {
+  secret = document.getElementById("secret").value;
+  post_json('/secret_set', { secret:secret })
+  return false;
+}
+
+function makeEvent() {
+  t = (document.getElementById("eventType").value == "In")? "<" : ">";
+  message = t + document.getElementById("event").value;
+  document.getElementById("event").value = "";
+  fetch('/state', {
+    method: 'POST',
+    body: message
+  })
+  return false;
+}
