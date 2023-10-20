@@ -3,9 +3,9 @@ import serial
 import io
 import time
 import logging
+import serial.tools.list_ports
 
 log = logging.getLogger(__name__)
-
 BOARD_IMG = Image.open("static/arduino.png").convert("RGBA")
 def get_pin_img_pos(pin_number, analog=False):
     offset = pin_number * 15
@@ -14,12 +14,16 @@ def get_pin_img_pos(pin_number, analog=False):
     else:
         return (434 - offset, 40) if (pin_number < 8) else (422 - offset, 40)
 
+ports = list(serial.tools.list_ports.comports())
+for p in ports:
+    print (p)
+
 class Arduino():
     """
     Models an Arduino connection
     """
 
-    def __init__(self, enabled = True, serial_port='/dev/ttyACM0', baud_rate=9600,
+    def __init__(self, enabled = True, serial_port='COM5', baud_rate=9600,
             read_timeout=5, pin_modes = ()):
         """
         Initializes the serial connection to the Arduino board
@@ -115,17 +119,17 @@ class Arduino():
             time.sleep(0.01)
 
 
-# if __name__ == '__main__':
+if __name__ == '__main__':
 
-#     import time
+    import time
 
-#     a = Arduino()
-#     time.sleep(3)
-#     a.set_pin_mode(13,'O')
-#     a.set_pin_mode(12,'I')
-#     time.sleep(1)
-#     a.digital_write(13,1)
-#     a.analog_write(5,245)
-#     print(a.digital_read(12))
-#     print(a.analog_read(2))
-#     time.sleep(5)
+    a = Arduino()
+    time.sleep(3)
+    a.set_pin_mode(13,'O')
+    a.set_pin_mode(12,'I')
+    time.sleep(1)
+    a.digital_write(13,1)
+    a.analog_write(5,245)
+    print(a.digital_read(12))
+    print(a.analog_read(2))
+    time.sleep(5)

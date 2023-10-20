@@ -11,7 +11,7 @@ class GPTConnection:
         self.state = state_obj
         self.persona = persona
         self.mindmap = mindmap
-        
+        print(self.mindmap)
         if not api_key:
             api_key = self.get_key()
         self.set_key(api_key)
